@@ -159,8 +159,8 @@ export function updatePlayer(dt) {
       P.vel.x = lerp(P.vel.x, 0, clamp(10 * dt, 0, 1));
       P.vel.z = lerp(P.vel.z, 0, clamp(10 * dt, 0, 1));
     }
-    // jump + gravity
-    if (input.keys.has('Space') && P.grounded) { P.vy = 9.5; P.grounded = false; }
+    // jump + gravity (Space edge-triggered, so a quick tap is never lost)
+    if (input.pressed.has('Space') && P.grounded) { P.vy = 9.5; P.grounded = false; }
     P.vy -= CFG.GRAVITY * dt;
     P.pos.y += P.vy * dt;
     if (P.pos.y <= 0) { P.pos.y = 0; P.vy = 0; P.grounded = true; }
@@ -187,13 +187,13 @@ export function updatePlayer(dt) {
     if (P.punchT > 0.2) P.armR.rotation.x = -1.4;
     P.group.position.copy(P.pos);
     P.group.rotation.y = -P.heading;
-    // enter a car
-    if (input.keys.has('KeyE') && P.interactT <= 0) {
+    // enter a car (E edge-triggered)
+    if (input.pressed.has('KeyE') && P.interactT <= 0) {
       const car = nearestCar(P.pos, 4.5);
       if (car) enterCar(P, car);
     }
-    // combat
-    if (input.keys.has('KeyF')) punch(P);
+    // combat (F edge-triggered)
+    if (input.pressed.has('KeyF')) punch(P);
     if (input.click) { shoot(P); input.click = false; }
     W.audio.setEngine(0, false);
   } else if (P.car) {
@@ -202,10 +202,12 @@ export function updatePlayer(dt) {
     P.pos.copy(P.car.pos);
     P.heading = P.car.heading;
     P.group.visible = false;
-    if (input.keys.has('KeyE') && P.interactT <= 0) exitCar(P);
+    if (input.pressed.has('KeyE') && P.interactT <= 0) exitCar(P);
     if (input.keys.has('KeyF')) W.audio.horn();
     W.stats.distance += Math.abs(P.car.speed) * dt;
   }
+  // consume this frame's edge-triggered presses
+  input.pressed.clear();
 
   // --- health regen + death ---
   if (P.health < 100 && W.elapsed - W.lastCrime > 8) P.health = Math.min(100, P.health + 4 * dt);

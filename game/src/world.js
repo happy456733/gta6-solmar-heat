@@ -31,7 +31,7 @@ export const W = {
   shotCamDist: undefined,
   shotCamPitch: undefined,
   missionLabel: null, // HUD title override for shot presets
-  input: { keys: new Set(), mouseDX: 0, mouseDY: 0, locked: false, click: false },
+  input: { keys: new Set(), pressed: new Set(), mouseDX: 0, mouseDY: 0, locked: false, click: false },
   camYaw: Math.PI / 2, // camera sits at pos + dist*(sin cy, cos cy); PI/2 = behind the player at spawn
   camPitch: 0.32,
   camDist: 9,

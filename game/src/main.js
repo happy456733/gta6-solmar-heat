@@ -81,6 +81,7 @@ function wireInput(canvas) {
   addEventListener('keydown', (e) => {
     if (e.repeat) return;
     input.keys.add(e.code);
+    input.pressed.add(e.code); // edge trigger: survives until a frame consumes it, so a quick tap is never lost between slow frames
     if (e.code === 'KeyM' && W.mode === 'play') startNextMission();
     if ((e.code === 'KeyP' || e.code === 'Escape') && (W.mode === 'play' || W.mode === 'paused')) togglePause();
     if (e.code === 'Space') e.preventDefault();
@@ -324,6 +325,7 @@ function tickWorld(dt) {
   } else if (W.mode === 'menu') {
     // slow orbit around the plaza behind the menu
     W.elapsed += dt;
+    W.input.pressed.clear(); // never carry a menu keypress into the game
     const a = W.elapsed * 0.05;
     W.camera.position.set(Math.sin(a) * 60, 26, Math.cos(a) * 60);
     W.camera.lookAt(0, 4, 0);
