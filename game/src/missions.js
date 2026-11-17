@@ -204,7 +204,7 @@ export function createMissions() {
     M.failed = false;
     M.timer = 0;
     const m = currentMission();
-    W.hud.toast(`${m.title} — ${m.giver}`);
+    if (!W.shotMode) W.hud.toast(`${m.title} — ${m.giver}`);
     if (!W.shotMode) W.hud.showBriefing(m);
     W.audio.missionStart();
     M.setupStep();

@@ -204,7 +204,10 @@ function applyShotPreset(shot) {
     P.pos.copy(car.pos); P.heading = 0;
     car.speed = 24;
     W.camYaw = -Math.PI / 2;
-    W.shotCamYaw = P.heading + Math.PI / 4; // front-quarter: car + pursuers in frame
+    // front-quarter from the north side: camera ahead of the car (so the
+    // pursuers behind it stay in frame) and north of the road, away from the
+    // lamps that stand on every intersection's north-east corner
+    W.shotCamYaw = Math.atan2(Math.cos(P.heading), -Math.sin(P.heading) - 1);
     W.shotCamDist = 16;
     W.shotCamPitch = 0.55; // high enough to clear lamps and palms
     W.missionLabel = 'GETAWAY';
@@ -255,7 +258,7 @@ function applyShotPreset(shot) {
     P.pos.copy(car.pos); P.heading = Math.PI;
     car.speed = 20;
     W.camYaw = Math.PI / 2;
-    W.shotCamYaw = P.heading + Math.PI / 4;
+    W.shotCamYaw = Math.atan2(Math.cos(P.heading), -Math.sin(P.heading) - 1);
     W.shotCamDist = 16;
     W.shotCamPitch = 0.55;
     W.missionLabel = 'NIGHT RUN';
@@ -275,7 +278,7 @@ function applyShotPreset(shot) {
       W.cars.splice(W.cars.indexOf(c), 1);
     }
     W.policeCars.forEach((c, i) => {
-      const back = 14 + i * 9;
+      const back = 12 + i * 6;
       c.pos.set(P.pos.x - Math.cos(P.heading) * back + (i % 2 ? 3.5 : -3.5), 0,
         P.pos.z + Math.sin(P.heading) * back);
       c.heading = P.heading;
@@ -283,6 +286,8 @@ function applyShotPreset(shot) {
       c.group.position.copy(c.pos);
       c.group.rotation.y = -c.heading;
     });
+    // let the getaway coast so the pursuers hold their ground in frame
+    W.input.keys.delete('KeyW');
     for (let i = 0; i < 45; i++) tickWorld(1 / 60);
   }
 }
