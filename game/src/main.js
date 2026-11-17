@@ -33,6 +33,7 @@ function boot() {
   W.camera = camera;
   W.renderer = renderer;
   W.clock = new THREE.Clock();
+  window.__solmar = W; // debug handle: lets tests and players inspect state
 
   buildCity();
   W.audio = createAudio();
