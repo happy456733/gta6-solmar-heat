@@ -197,14 +197,15 @@ export function updatePlayer(dt) {
     if (input.click) { shoot(P); input.click = false; }
     W.audio.setEngine(0, false);
   } else if (P.car) {
-    // --- driving ---
-    drivePlayerCar(P.car, dt, input);
-    P.pos.copy(P.car.pos);
-    P.heading = P.car.heading;
+    // --- driving --- (local ref: exitCar() below nulls P.car)
+    const car = P.car;
+    drivePlayerCar(car, dt, input);
+    P.pos.copy(car.pos);
+    P.heading = car.heading;
     P.group.visible = false;
     if (input.pressed.has('KeyE') && P.interactT <= 0) exitCar(P);
     if (input.keys.has('KeyF')) W.audio.horn();
-    W.stats.distance += Math.abs(P.car.speed) * dt;
+    W.stats.distance += Math.abs(car.speed) * dt;
   }
   // consume this frame's edge-triggered presses
   input.pressed.clear();
