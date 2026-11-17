@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solmar Heat — Open-World Crime</title>
+<link rel="stylesheet" href="./style.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.min.js" } }
+</script>
+</head>
+<body>
+<div id="app"></div>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div id="top-left">
+    <div id="cash">$0</div>
+    <div id="health-bar"><div id="health-fill"></div></div>
+    <div id="mission-title">FREE ROAM</div>
+  </div>
+  <div id="top-right">
+    <div id="stars">☆☆☆☆☆</div>
+    <div id="clock">SOLMAR 12:00</div>
+  </div>
+  <div id="bottom-left"><canvas id="minimap" width="190" height="190"></canvas></div>
+  <div id="bottom-center"><div id="objective"></div></div>
+  <div id="bottom-right"><div id="speed"></div></div>
+  <div id="prompt"></div>
+  <div id="crosshair">+</div>
+  <div id="toast"></div>
+  <div id="damage"></div>
+</div>
+
+<!-- Briefing card -->
+<div id="briefing" class="overlay-card">
+  <div class="brief-title"></div>
+  <div class="brief-text"></div>
+  <div class="brief-reward"></div>
+</div>
+
+<!-- Mission complete / failed toasts -->
+<div id="mission-done" class="overlay-card center-card">
+  <div class="md-title"></div>
+  <div class="md-text"></div>
+</div>
+<div id="mission-failed" class="overlay-card center-card">
+  <div class="mf-title"></div>
+  <div class="mf-text"></div>
+  <button id="btn-retry" class="btn">RETRY MISSION</button>
+</div>
+
+<!-- Start menu -->
+<div id="menu" class="overlay show">
+  <div class="menu-inner">
+    <div class="game-title">SOLMAR<span>HEAT</span></div>
+    <div class="game-sub">An open-world crime story &middot; Solmar City</div>
+    <div class="menu-buttons">
+      <button id="btn-new" class="btn big">NEW GAME</button>
+      <button id="btn-continue" class="btn big">CONTINUE</button>
+    </div>
+    <div id="mission-list"></div>
+    <div class="controls">
+      <b>WASD</b> move / drive &nbsp;·&nbsp; <b>Mouse</b> look &nbsp;·&nbsp; <b>E</b> enter / exit car<br>
+      <b>F</b> punch &nbsp;·&nbsp; <b>Click</b> shoot &nbsp;·&nbsp; <b>Shift</b> sprint &nbsp;·&nbsp; <b>Space</b> jump / brake<br>
+      <b>M</b> missions &nbsp;·&nbsp; <b>P</b> pause &nbsp;·&nbsp; Click the game to lock the mouse
+    </div>
+    <div class="menu-foot">Jax Cole is back in Solmar. He owes King Bell. Six jobs stand between him and freedom.</div>
+  </div>
+</div>
+
+<!-- Pause -->
+<div id="pause" class="overlay">
+  <div class="menu-inner">
+    <div class="game-title small">PAUSED</div>
+    <div class="menu-buttons">
+      <button id="btn-resume" class="btn big">RESUME</button>
+      <button id="btn-quit" class="btn big">SAVE &amp; QUIT TO MENU</button>
+    </div>
+    <div class="controls">Progress saves automatically after every mission.</div>
+  </div>
+</div>
+
+<!-- Busted / Wasted -->
+<div id="busted" class="overlay">
+  <div class="menu-inner">
+    <div class="game-title small red">BUSTED</div>
+    <div class="menu-foot">The Solmar PD hauled you in. Your car was impounded and the job fell through.</div>
+    <div class="menu-buttons"><button id="btn-busted-ok" class="btn big">WALK FREE</button></div>
+  </div>
+</div>
+<div id="wasted" class="overlay">
+  <div class="menu-inner">
+    <div class="game-title small red">WASTED</div>
+    <div class="menu-foot">Jax is down. The crew drags him to the safehouse to patch him up.</div>
+    <div class="menu-buttons"><button id="btn-wasted-ok" class="btn big">GET UP</button></div>
+  </div>
+</div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
