@@ -205,8 +205,8 @@ function applyShotPreset(shot) {
     car.speed = 24;
     W.camYaw = -Math.PI / 2;
     W.shotCamYaw = P.heading + Math.PI / 4; // front-quarter: car + pursuers in frame
-    W.shotCamDist = 18;
-    W.shotCamPitch = 0.62; // high enough to clear lamps and palms
+    W.shotCamDist = 16;
+    W.shotCamPitch = 0.55; // high enough to clear lamps and palms
     W.missionLabel = 'GETAWAY';
     W.police.setWanted(3);
     M.objective = 'Escape the Solmar PD — lose the cops!';
@@ -256,8 +256,8 @@ function applyShotPreset(shot) {
     car.speed = 20;
     W.camYaw = Math.PI / 2;
     W.shotCamYaw = P.heading + Math.PI / 4;
-    W.shotCamDist = 18;
-    W.shotCamPitch = 0.62;
+    W.shotCamDist = 16;
+    W.shotCamPitch = 0.55;
     W.missionLabel = 'NIGHT RUN';
     W.police.setWanted(1);
     M.objective = 'Night run — stay ahead of the SPPD';

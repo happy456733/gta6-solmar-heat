@@ -110,7 +110,7 @@ export function createMissions() {
   M.diamond = diamond;
 
   // --- landmark buildings for the story places ---
-  function landmark(x, z, w, h, d, color, sign) {
+  function landmark(x, z, w, h, d, color, style) {
     const g = new THREE.Group();
     const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color }));
     b.position.y = h / 2;
@@ -119,14 +119,46 @@ export function createMissions() {
     const roof = new THREE.Mesh(new THREE.BoxGeometry(w * 0.96, 0.5, d * 0.96), new THREE.MeshLambertMaterial({ color: 0x3a3a42 }));
     roof.position.y = h + 0.25;
     g.add(roof);
+    // details on the face toward the street/marker (local +z = south side)
+    const cream = new THREE.MeshLambertMaterial({ color: 0xf0e8d8 });
+    const dark = new THREE.MeshLambertMaterial({ color: 0x1a2a3a });
+    if (style === 'bank') {
+      for (const cx of [-w / 2 + 3, -w / 6, w / 6, w / 2 - 3]) {
+        const col = new THREE.Mesh(new THREE.BoxGeometry(1.3, h * 0.72, 1.3), cream);
+        col.position.set(cx, h * 0.36, d / 2 + 0.7);
+        g.add(col);
+      }
+      const door = new THREE.Mesh(new THREE.BoxGeometry(4.5, 6.5, 0.3), dark);
+      door.position.set(0, 3.25, d / 2 + 0.25);
+      g.add(door);
+      const sign = new THREE.Mesh(new THREE.BoxGeometry(w * 0.8, 1.8, 0.3), new THREE.MeshBasicMaterial({ color: 0x2a4a6a }));
+      sign.position.set(0, h - 1.4, d / 2 + 0.25);
+      g.add(sign);
+    } else if (style === 'garage') {
+      const door = new THREE.Mesh(new THREE.BoxGeometry(13, 5, 0.3), dark);
+      door.position.set(0, 2.5, d / 2 + 0.2);
+      g.add(door);
+      const sign = new THREE.Mesh(new THREE.BoxGeometry(15, 1.6, 0.3), new THREE.MeshBasicMaterial({ color: 0xffd23a }));
+      sign.position.set(0, h - 1, d / 2 + 0.2);
+      g.add(sign);
+    } else if (style === 'house') {
+      const door = new THREE.Mesh(new THREE.BoxGeometry(2.4, 4.2, 0.3), dark);
+      door.position.set(-3, 2.1, d / 2 + 0.2);
+      g.add(door);
+      for (const wx of [2.5, 6]) {
+        const win = new THREE.Mesh(new THREE.BoxGeometry(2.6, 2.2, 0.2), new THREE.MeshBasicMaterial({ color: 0xffd98a }));
+        win.position.set(wx, 4.4, d / 2 + 0.15);
+        g.add(win);
+      }
+    }
     g.position.set(x, 0, z);
     W.scene.add(g);
     W.colliders.push({ minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2 });
     return g;
   }
-  landmark(108, 22, 24, 7, 14, 0xc96a3a); // garage (marker sits on the street side)
-  landmark(-108, -50, 16, 8, 12, 0x7a9aaa); // safehouse
-  landmark(-36, -122, 22, 16, 16, 0xd8c8a8); // bank
+  landmark(108, 22, 24, 7, 14, 0xc96a3a, 'garage'); // garage (marker sits on the street side)
+  landmark(-108, -50, 16, 8, 12, 0x7a9aaa, 'house'); // safehouse
+  landmark(-36, -122, 22, 16, 16, 0xd8c8a8, 'bank'); // bank
   // dock containers
   for (let i = 0; i < 6; i++) {
     const c = new THREE.Mesh(new THREE.BoxGeometry(8, 3, 3),
@@ -173,7 +205,7 @@ export function createMissions() {
     M.timer = 0;
     const m = currentMission();
     W.hud.toast(`${m.title} — ${m.giver}`);
-    W.hud.showBriefing(m);
+    if (!W.shotMode) W.hud.showBriefing(m);
     W.audio.missionStart();
     M.setupStep();
   };
