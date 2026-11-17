@@ -100,7 +100,7 @@ export function createHUD() {
     // objective
     els.objective.textContent = W.missions ? W.missions.objective : '';
     const active = W.missions && W.missions.active;
-    els.missionTitle.textContent = active ? W.missions.missionList()[W.missions.index].title.toUpperCase() : 'FREE ROAM';
+    els.missionTitle.textContent = W.missionLabel || (active ? W.missions.missionList()[W.missions.index].title.toUpperCase() : 'FREE ROAM');
     // speed
     if (P.car && !P.onFoot) {
       const kmh = Math.round(Math.abs(P.car.speed) * 3.6);

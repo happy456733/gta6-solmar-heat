@@ -1,7 +1,8 @@
 // Solmar Heat — pedestrians: sidewalk walkers who stroll, chat, panic and run
 // when a car screams past or a shot rings out.
 import * as THREE from 'three';
-import { CFG, W, STREETS, rand, randi, pick, clamp, lerp, angleLerp, collideCircle, randomSidewalkPoint } from './world.js';
+import { CFG, W, STREETS, rand, randi, pick, clamp, lerp, angleLerp, collideCircle } from './world.js';
+import { randomSidewalkPoint } from './city.js';
 
 const SHIRTS = [0xe84a4a, 0x4a8ae8, 0x4ae87a, 0xe8d84a, 0xe84ac8, 0x8a4ae8, 0xf0f0f0, 0x3a3a3a, 0x4aa8a8];
 const SKINS = [0xe8b88a, 0xc98a5a, 0x8a5a3a, 0xf0c8a0, 0x6a4a2a];
@@ -40,6 +41,16 @@ export function makePed() {
     target: null, panic: 0, walkPhase: rand(Math.PI * 2), downT: 0,
   };
   group.position.copy(ped.pos);
+  return ped;
+}
+
+export function placePed(x, z) {
+  const ped = makePed();
+  ped.pos.set(x, 0, z);
+  ped.target = { x: x + rand(-30, 30), z: z + rand(-30, 30) };
+  ped.group.position.copy(ped.pos);
+  W.scene.add(ped.group);
+  W.peds.push(ped);
   return ped;
 }
 

@@ -83,15 +83,15 @@ function groundTexture() {
       g.fillRect(px(s - 0.6), px(v), 1.2 * sc, 9 * sc);
     }
   }
-  // crosswalks at every intersection
-  g.fillStyle = 'rgba(240,240,235,0.85)';
+  // crosswalks at every intersection (narrow stripes, wide gaps, so they read as dashes)
+  g.fillStyle = 'rgba(240,240,235,0.75)';
   for (const sx of STREETS) {
     for (const sz of STREETS) {
       for (let k = -2; k <= 2; k++) {
-        g.fillRect(px(sx + k * 3.2 - 1.1), px(sz - CFG.STREET / 2 + 1), 2.2 * sc, 3.4 * sc);
-        g.fillRect(px(sx + k * 3.2 - 1.1), px(sz + CFG.STREET / 2 - 4.4), 2.2 * sc, 3.4 * sc);
-        g.fillRect(px(sx - CFG.STREET / 2 + 1), px(sz + k * 3.2 - 1.1), 3.4 * sc, 2.2 * sc);
-        g.fillRect(px(sx + CFG.STREET / 2 - 4.4), px(sz + k * 3.2 - 1.1), 3.4 * sc, 2.2 * sc);
+        g.fillRect(px(sx + k * 4.6 - 0.6), px(sz - CFG.STREET / 2 + 1), 1.2 * sc, 3.4 * sc);
+        g.fillRect(px(sx + k * 4.6 - 0.6), px(sz + CFG.STREET / 2 - 4.4), 1.2 * sc, 3.4 * sc);
+        g.fillRect(px(sx - CFG.STREET / 2 + 1), px(sz + k * 4.6 - 0.6), 3.4 * sc, 1.2 * sc);
+        g.fillRect(px(sx + CFG.STREET / 2 - 4.4), px(sz + k * 4.6 - 0.6), 3.4 * sc, 1.2 * sc);
       }
     }
   }
@@ -179,7 +179,9 @@ export function buildCity() {
   const roofMat = new THREE.MeshLambertMaterial({ color: 0x4a4a52 });
   const downtown = (x, z) => Math.hypot(x, z) < 150;
   const parkBlocks = new Set(['1,-1', '-2,2']);
-  const skipBlocks = new Set(['0,0', '0,-1', '-1,0']); // central plaza + garage block
+  // central plaza + story blocks (garage, safehouse, bank) stay clear so their
+  // landmarks and mission markers are never walled off by random buildings
+  const skipBlocks = new Set(['0,0', '0,-1', '-1,0', '1,0', '-2,-1', '-1,-2']);
 
   for (let i = -4; i < 4; i++) {
     for (let j = -4; j < 4; j++) {
@@ -321,21 +323,20 @@ export function buildCity() {
   scene.fog = new THREE.Fog(0xcfe0f0, 320, 900);
 
   city.update = (dt) => {
-    const t = W.dayTime; // 0..1
-    // sun angle: rises 0.0 (dawn) -> noon 0.5 -> dusk 1.0
-    const ang = t * Math.PI;
-    const sunH = Math.sin(ang); // 0 at dawn/dusk, 1 at noon
+    const t = W.dayTime; // 0..1, full 24h: 0 dawn, 0.25 noon, 0.5 dusk, 0.75 midnight
+    const ang = t * Math.PI * 2;
+    const sunH = Math.sin(ang); // 1 at noon, -1 at midnight
     const day = clamp(sunH * 1.6, 0, 1);
     const dusk = clamp(1 - Math.abs(t - 0.5) * 4, 0, 1) * (1 - day);
     sun.position.set(Math.cos(ang) * 420, 60 + sunH * 320, 180);
-    sun.intensity = 0.25 + day * 2.1;
+    sun.intensity = 0.1 + day * 2.2;
     sun.color.setHSL(0.09 + day * 0.02, 0.55, 0.55 + day * 0.15);
-    moon.intensity = day < 0.15 ? 0.5 : 0;
-    hemi.intensity = 0.25 + day * 0.7;
+    moon.intensity = day < 0.15 ? 1.0 : 0;
+    hemi.intensity = 0.45 + day * 0.55;
     const sky = new THREE.Color();
     if (day > 0.5) sky.setHSL(0.58, 0.55, 0.62 + day * 0.12);
     else if (t < 0.5) sky.setHSL(0.07 + dusk * 0.03, 0.6, 0.42 + day * 0.1); // dawn/dusk orange
-    else sky.setHSL(0.62, 0.35, 0.12 + day * 0.1); // night
+    else sky.setHSL(0.62, 0.4, 0.2 + day * 0.1); // night
     scene.background = sky;
     scene.fog.color.copy(sky);
     // lamps glow at night

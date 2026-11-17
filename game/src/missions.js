@@ -1,7 +1,8 @@
 // Solmar Heat — the story of Jax Cole: six jobs for fixer Lena Torres to pay
 // off a debt to King Bell, plus cash pickups scattered around Solmar.
 import * as THREE from 'three';
-import { CFG, W, rand, randi, pick, clamp, lerp, angleLerp, collideCircle, randomSidewalkPoint } from './world.js';
+import { CFG, W, rand, randi, pick, clamp, lerp, angleLerp, collideCircle } from './world.js';
+import { randomSidewalkPoint } from './city.js';
 import { makeCar, placeCar, spawnParkedCar, randomRoute } from './vehicles.js';
 
 // Key places in Solmar (world coords).

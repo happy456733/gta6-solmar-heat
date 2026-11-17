@@ -1,7 +1,8 @@
 // Solmar Heat — the wanted system: heat rises with crimes, Solmar PD cars
 // chase and ram, foot cops chase on foot, and getting caught means BUSTED.
 import * as THREE from 'three';
-import { CFG, W, rand, pick, clamp, lerp, angleLerp, collideCircle, randomRoadPoint } from './world.js';
+import { CFG, W, rand, pick, clamp, lerp, angleLerp, collideCircle } from './world.js';
+import { randomRoadPoint } from './city.js';
 import { makeCar, placeCar } from './vehicles.js';
 
 export function createPolice() {

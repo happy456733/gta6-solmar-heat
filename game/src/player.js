@@ -274,9 +274,10 @@ function updateCamera(dt) {
   }
   const dist = W.shotCamDist || (P.onFoot ? 7.5 : 10.5);
   const height = P.onFoot ? 3.2 : 4.2;
-  const tx = P.pos.x + Math.sin(W.camYaw) * dist * Math.cos(W.camPitch);
-  const tz = P.pos.z + Math.cos(W.camYaw) * dist * Math.cos(W.camPitch);
-  const ty = (P.pos.y + height) + Math.sin(W.camPitch) * dist;
+  const pitch = W.shotMode && W.shotCamPitch !== undefined ? W.shotCamPitch : W.camPitch;
+  const tx = P.pos.x + Math.sin(W.camYaw) * dist * Math.cos(pitch);
+  const tz = P.pos.z + Math.cos(W.camYaw) * dist * Math.cos(pitch);
+  const ty = (P.pos.y + height) + Math.sin(pitch) * dist;
   const k = clamp(6 * dt, 0, 1);
   cam.position.x = lerp(cam.position.x, tx, k);
   cam.position.y = lerp(cam.position.y, ty, k);

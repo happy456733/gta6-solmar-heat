@@ -1,7 +1,8 @@
 // Solmar Heat — cars: the boxy low-poly car factory, arcade driving physics,
 // parked cars to steal, and traffic that follows the street grid.
 import * as THREE from 'three';
-import { CFG, W, STREETS, rand, randi, pick, clamp, lerp, angleDiff, angleLerp, collideCircle, clampToCity, randomRoadPoint } from './world.js';
+import { CFG, W, STREETS, rand, randi, pick, clamp, lerp, angleDiff, angleLerp, collideCircle, clampToCity } from './world.js';
+import { randomRoadPoint } from './city.js';
 
 const CAR_COLORS = [
   0xd83a2e, 0x2e7ad8, 0xe8b13a, 0x3aa84a, 0x8a3ad8, 0xd8d8d8,
@@ -100,8 +101,9 @@ function lanePoint(ix, iz, dx, dz) {
   return { x: ix * CFG.PITCH + ox, z: iz * CFG.PITCH + oz };
 }
 
-export function randomRoute(len = 6) {
-  let ix = randi(-4, 4), iz = randi(-4, 4);
+export function randomRoute(len = 6, startIx, startIz) {
+  let ix = startIx !== undefined ? startIx : randi(-4, 4);
+  let iz = startIz !== undefined ? startIz : randi(-4, 4);
   const pts = [{ x: ix * CFG.PITCH, z: iz * CFG.PITCH }];
   let dx = pick([-1, 0, 1]), dz = dx === 0 ? pick([-1, 1]) : 0;
   for (let i = 0; i < len; i++) {
@@ -168,7 +170,15 @@ export function updateTraffic(dt) {
       continue;
     }
     const tgt = car.path[car.wp];
-    if (!tgt) { car.path = randomRoute(randi(5, 9)); car.wp = 1; continue; }
+    if (!tgt) {
+      // new route starts at the intersection the car just reached, so it
+      // never cuts across a block to find its next waypoint
+      const ix = clamp(Math.round(car.pos.x / CFG.PITCH), -4, 4);
+      const iz = clamp(Math.round(car.pos.z / CFG.PITCH), -4, 4);
+      car.path = randomRoute(randi(5, 9), ix, iz);
+      car.wp = 1;
+      continue;
+    }
     const dx = tgt.x - car.pos.x, dz = tgt.z - car.pos.z;
     const dist = Math.hypot(dx, dz);
     const wantHeading = Math.atan2(-dz, dx);

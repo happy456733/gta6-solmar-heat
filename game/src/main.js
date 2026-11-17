@@ -5,8 +5,8 @@ import { CFG, W, STREETS, rand, clamp } from './world.js';
 import { buildCity } from './city.js';
 import { createAudio } from './audio.js';
 import { createEffects } from './effects.js';
-import { spawnTrafficCar, spawnParkedCar } from './vehicles.js';
-import { spawnPed } from './peds.js';
+import { spawnTrafficCar, spawnParkedCar, makeCar, placeCar } from './vehicles.js';
+import { spawnPed, placePed } from './peds.js';
 import { createPolice } from './police.js';
 import { createPlayer, updatePlayer } from './player.js';
 import { createMissions } from './missions.js';
@@ -205,18 +205,39 @@ function applyShotPreset(shot) {
     car.speed = 24;
     W.camYaw = -Math.PI / 2;
     W.shotCamYaw = P.heading + Math.PI / 4; // front-quarter: car + pursuers in frame
-    W.shotCamDist = 16;
+    W.shotCamDist = 18;
+    W.shotCamPitch = 0.62; // high enough to clear lamps and palms
+    W.missionLabel = 'GETAWAY';
     W.police.setWanted(3);
     M.objective = 'Escape the Solmar PD — lose the cops!';
     M.active = false;
     W.input.keys.add('KeyW'); // keep the getaway rolling during pre-sim
   } else if (shot === 'city') {
     W.dayTime = 0.3;
-    P.pos.set(0, 0, 72);
+    P.pos.set(12, 0, 84); // on the sidewalk, looking north up the avenue
     P.heading = Math.PI / 2;
     W.camYaw = 0;
+    W.shotCamDist = 12;
+    W.shotCamPitch = 0.45;
+    W.missionLabel = 'SOLMAR CITY';
     M.objective = 'Solmar City — explore on foot or steal a car (E)';
     M.active = false;
+    // traffic + peds on the avenue so the frame is alive (northbound lane x=+3.4,
+    // southbound lane x=-3.4; routes run straight up the avenue)
+    for (const [x, z, h, path] of [
+      [3.4, 30, Math.PI / 2, [{ x: 3.4, z: 0 }, { x: 3.4, z: -72 }, { x: 3.4, z: -144 }, { x: 3.4, z: -216 }, { x: 3.4, z: -288 }]],
+      [-3.4, 110, -Math.PI / 2, [{ x: -3.4, z: 144 }, { x: -3.4, z: 216 }, { x: -3.4, z: 288 }]],
+      [3.4, 130, Math.PI / 2, [{ x: 3.4, z: 72 }, { x: 3.4, z: 0 }, { x: 3.4, z: -72 }, { x: 3.4, z: -144 }]],
+    ]) {
+      const c = makeCar(0x2e7ad8);
+      c.path = path;
+      c.wp = 1;
+      c.cruise = 11;
+      placeCar(c, x, z, h);
+      c.speed = 11;
+      W.traffic.push(c);
+    }
+    for (const [x, z] of [[10, 76], [14, 92], [8, 100], [-10, 88]]) placePed(x, z);
   } else if (shot === 'mission') {
     W.dayTime = 0.35;
     M.startMission(4);
@@ -225,16 +246,19 @@ function applyShotPreset(shot) {
     P.pos.set(-36, 0, -88);
     P.heading = Math.PI / 2; // face the bank (north)
     W.camYaw = 0;
+    W.missionLabel = 'THE VAULT JOB';
     W.police.setWanted(1);
   } else if (shot === 'night') {
-    W.dayTime = 0.82;
+    W.dayTime = 0.68; // 22:19 — true night, lamps and lit windows on
     const car = spawnParkedCar(144, 144, Math.PI, 0x2e7ad8);
     P.onFoot = false; P.car = car; car.isPlayer = true; P.group.visible = false;
     P.pos.copy(car.pos); P.heading = Math.PI;
     car.speed = 20;
     W.camYaw = Math.PI / 2;
     W.shotCamYaw = P.heading + Math.PI / 4;
-    W.shotCamDist = 16;
+    W.shotCamDist = 18;
+    W.shotCamPitch = 0.62;
+    W.missionLabel = 'NIGHT RUN';
     W.police.setWanted(1);
     M.objective = 'Night run — stay ahead of the SPPD';
     M.active = false;
@@ -244,12 +268,18 @@ function applyShotPreset(shot) {
   for (let i = 0; i < 150; i++) tickWorld(1 / 60);
   // pull police cars in behind the player for the chase / night shots
   if (shot === 'chase' || shot === 'night') {
+    // keep exactly three pursuers, close behind and in frame
+    while (W.policeCars.length > 3) {
+      const c = W.policeCars.pop();
+      W.scene.remove(c.group);
+      W.cars.splice(W.cars.indexOf(c), 1);
+    }
     W.policeCars.forEach((c, i) => {
-      const back = 16 + i * 11;
+      const back = 14 + i * 9;
       c.pos.set(P.pos.x - Math.cos(P.heading) * back + (i % 2 ? 3.5 : -3.5), 0,
         P.pos.z + Math.sin(P.heading) * back);
       c.heading = P.heading;
-      c.speed = 24;
+      c.speed = 26;
       c.group.position.copy(c.pos);
       c.group.rotation.y = -c.heading;
     });
