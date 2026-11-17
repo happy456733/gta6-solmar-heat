@@ -171,7 +171,7 @@ export function createMissions() {
   }
 
   // --- the orange Comet for mission 1 ---
-  const comet = spawnParkedCar(96, 44, Math.PI / 2, 0xe86a1a);
+  const comet = spawnParkedCar(96, 44, -Math.PI / 2, 0xe86a1a); // orange Comet, nosed SOUTH toward the open street (heading -PI/2 => forward +z)
   comet.name = 'Comet';
 
   // --- cash pickups ---
